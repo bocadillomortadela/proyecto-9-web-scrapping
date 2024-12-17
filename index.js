@@ -14,7 +14,8 @@ const scrapper = async (url) => {
     console.log(`Visiting: ${url}`)
     await page.goto(fullUrl)
 
-    const productList = await page.$$('.sc-597dbd60-0')
+    const productList = await page.$$('[data-test="mms-product-card"]')
+    console.log(productList.length)
 
     if (productList.length === 0) {
       console.log('no se encontro mas productos, fin del scraping')
@@ -24,7 +25,7 @@ const scrapper = async (url) => {
     for (const productDiv of productList) {
       try {
         let img = await productDiv.$eval('img', (el) => el.src)
-        let price = await productDiv.$eval('.sc-e0c7d9f7-0 ', (el) => el.textContent)
+        let price = await productDiv.$eval('.sc-dd1a61d2-2', (el) => el.textContent)
         let cleanedPrice = price.replace(/[^\d,]/g, '')
         let integerPrice = parseInt(cleanedPrice, 10)
         let title = await productDiv.$eval('[data-test="product-title"]', (el) => el.textContent)
@@ -34,6 +35,8 @@ const scrapper = async (url) => {
           integerPrice,
           title
         }
+        console.log(product)
+
         productArray.push(product)
       } catch (error) {
         console.log('error al extraer un producto:', err.message)
